@@ -25,11 +25,12 @@ See `networking-tools/README.md` for details.
 Work with images locally:
 
 - **Image Scrubber** — drag & drop images into a local web page and get
-  back copies with all metadata stripped (EXIF, GPS, camera info), plus an
-  optional "tag as AI-generated" marker.
+  back copies with all metadata stripped (EXIF, GPS, camera info), plus
+  optional extras: remove the background (tiny on-device AI), tag as
+  AI-generated, and scrub filenames to date + sequence.
 
 ```bash
-python -m pip install Pillow
+python -m pip install -r image-tools/requirements.txt
 cd image-tools
 python run_image_scrubber.py
 ```
