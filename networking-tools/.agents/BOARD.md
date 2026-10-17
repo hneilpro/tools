@@ -39,7 +39,10 @@ Next: <owner/role + exact next action, or "none">
 
 <!-- Post new entries below this line, newest first. -->
 
-## 2026-10-06 — builder — SETUP — agent template installed
+## 2026-10-17 — builder — TOOLS-REPO — repo restructured into tools/ with image-tools/
+Owner asked to rename the repo to `tools` and split it into `networking-tools/` and `image-tools/` folders. All existing files git-moved into `networking-tools/` (history preserved); new Image Scrubber added under `image-tools/` (drag-drop web UI, strips all metadata, optional AI-generated tag). New root README.md + AGENTS.md describe both families. Branch: restructure/tools-repo. Repo renamed to hneilpro/tools via `gh repo rename` 2026-10-17; local clone moved to ~/workspace/repos/tools with remote updated.
+Evidence: git status shows renames (R) + new image-tools/ tree; tests/test_scrub.py 14/14 PASS; server e2e (token gate, clean, download, zip) PASS.
+Next: owner reviews branch, renames repo to tools, merges.
 Installed the standard agent folder (master: ~/workspace/agent-template/) and filled in the repo commands in AGENTS.md. No code changes.
 Evidence: .agents/ tree present in repo root; installer reported 31 files created, 0 skipped.
 Next: none until the next task; first real task should open a tasks/ file and follow the workflows.
