@@ -1,0 +1,10 @@
+# Image Scrubber dependencies. Install with:
+#   python -m pip install -r requirements.txt
+#
+# Pillow does the metadata scrubbing and AI-generated tagging.
+# rembg + onnxruntime are only needed for the "Remove background" option
+# (tiny ~5MB u2netp model, CPU only, fully local). The scrubber runs fine
+# without them and the UI says so if you tick the box.
+Pillow
+rembg
+onnxruntime

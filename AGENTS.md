@@ -33,7 +33,7 @@ two independent tool families; each has its own agent folder and rules.
 - Networking install: `python -m pip install -r networking-tools/requirements-dev.txt`
 - Networking run: `cd networking-tools && python run_networking_tools.py`
 - Networking test: `cd networking-tools && python -m pytest`
-- Image install: `python -m pip install Pillow`
+- Image install: `python -m pip install -r image-tools/requirements.txt`
 - Image run: `cd image-tools && python run_image_scrubber.py`
 - Image test: `cd image-tools && python tests/test_scrub.py`
 - Lint: none configured; syntax-check changed Python with `python -m py_compile`

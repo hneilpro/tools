@@ -22,8 +22,7 @@ everything. Useful before sharing or posting photos.
 - Cleaned files download individually, or all at once as a zip.
 
 ```bash
-python -m pip install Pillow               # scrubbing + AI tag
-python -m pip install rembg onnxruntime    # also needed for background removal
+python -m pip install -r requirements.txt  # Pillow + rembg + onnxruntime
 python run_image_scrubber.py            # start + open browser
 python run_image_scrubber.py --no-open  # start, print the URL only
 ```
