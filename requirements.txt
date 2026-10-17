@@ -1,0 +1,4 @@
+# Runtime dependencies for every tool in this repo.
+# Install with: python -m pip install -r requirements.txt
+# (Networking tools are stdlib-only; this pulls the image-tools deps.)
+-r image-tools/requirements.txt
