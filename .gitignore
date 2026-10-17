@@ -9,4 +9,4 @@ __pycache__/
 *.log
 # Local user settings (expected plan speeds). Personal, per-PC data
 # written by the app itself; never committed.
-network_monitor/local_data/
+networking-tools/network_monitor/local_data/
