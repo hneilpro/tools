@@ -51,6 +51,13 @@ PAGE = """<!DOCTYPE html>
   </div>
 
   <div class="opts">
+    <input id="rmbg" type="checkbox">
+    <label for="rmbg">Remove background
+      <small>Tiny on-device AI (~5MB model, CPU only). Needs <code>pip install rembg onnxruntime</code> — first run downloads the model once.</small>
+    </label>
+  </div>
+
+  <div class="opts">
     <input id="aitag" type="checkbox">
     <label for="aitag">Tag as AI-generated content
       <small>Adds a small "AI-generated" marker to the cleaned file (EXIF comment / PNG text).</small>
@@ -109,6 +116,7 @@ go.addEventListener("click", async () => {
   const fd = new FormData();
   files.forEach(f => fd.append("files", f, f.name));
   fd.append("ai_tag", document.getElementById("aitag").checked ? "1" : "0");
+  fd.append("remove_bg", document.getElementById("rmbg").checked ? "1" : "0");
   try {
     const r = await api("/api/clean", {method: "POST", body: fd});
     const j = await r.json();

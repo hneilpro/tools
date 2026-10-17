@@ -13,12 +13,17 @@ everything. Useful before sharing or posting photos.
   marker to the cleaned file (EXIF UserComment on JPEG/WebP, PNG text
   chunk on PNG) so the file is honestly labeled without leaking anything
   else.
+- Optional **"Remove background"** checkbox runs a tiny on-device AI
+  (rembg + the ~5MB `u2netp` model, CPU only, no GPU/cloud/account) and
+  returns the subject on transparency as PNG. The model downloads once on
+  first use (~/.rembg).
 - Supports JPG, PNG, WebP, TIFF, BMP. EXIF orientation is applied first,
   so cleaned photos display exactly as the originals did.
 - Cleaned files download individually, or all at once as a zip.
 
 ```bash
-python -m pip install Pillow
+python -m pip install Pillow               # scrubbing + AI tag
+python -m pip install rembg onnxruntime    # also needed for background removal
 python run_image_scrubber.py            # start + open browser
 python run_image_scrubber.py --no-open  # start, print the URL only
 ```

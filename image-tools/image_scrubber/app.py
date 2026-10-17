@@ -200,6 +200,24 @@ def make_handler(token: str):
                 self._send(400, {"error": f"Too many files (max {MAX_FILES})."})
                 return
             ai_tag = fields.get("ai_tag") in ("1", "true", "on", "yes")
+            want_bg = fields.get("remove_bg") in ("1", "true", "on", "yes")
+
+            if want_bg:
+                # Fail fast with a clear message instead of per-file errors.
+                try:
+                    from .bgremove import remove_background  # noqa: F401
+                except ImportError:
+                    self._send(400, {"error": "Background removal needs extra packages: pip install rembg onnxruntime"})
+                    return
+                try:
+                    from . import bgremove as _bgmod
+                    _bgmod._get_session()
+                except RuntimeError as exc:
+                    self._send(400, {"error": str(exc)})
+                    return
+                except Exception as exc:
+                    self._send(500, {"error": f"Could not load the background-removal model: {exc}"})
+                    return
 
             _prune_batches()
             batch_id = uuid.uuid4().hex[:12]
@@ -208,6 +226,14 @@ def make_handler(token: str):
             ok_count = 0
             for _field, filename, data in files:
                 safe_name = (filename or "image").rsplit("/", 1)[-1].rsplit("\\", 1)[-1] or "image"
+                bg_note = ""
+                if want_bg:
+                    bg_result = remove_background(data, safe_name)
+                    if not bg_result["ok"]:
+                        items.append({"ok": False, "filename": safe_name, "error": bg_result["error"]})
+                        continue
+                    data, safe_name = bg_result["data"], bg_result["out_filename"]
+                    bg_note = bg_result["note"] + " "
                 result = scrub_image(data, safe_name, ai_tag=ai_tag)
                 if result["ok"]:
                     fid = uuid.uuid4().hex[:8]
@@ -215,12 +241,13 @@ def make_handler(token: str):
                     ok_count += 1
                     items.append({"ok": True, "id": fid, "filename": safe_name,
                                   "out_filename": result["out_filename"],
-                                  "note": result["note"], "size": result["size"]})
+                                  "note": bg_note + result["note"], "size": result["size"]})
                 else:
                     items.append({"ok": False, "filename": safe_name, "error": result["error"]})
             with _batches_lock:
                 _batches[batch_id] = {"created": time.time(), "files": stored}
             summary = (f"Scrubbed {ok_count} of {len(files)} file(s) clean."
+                       + (" Backgrounds removed." if want_bg and ok_count else "")
                        + (" AI tag applied." if ai_tag and ok_count else ""))
             self._send(200, {"batch": batch_id, "items": items, "summary": summary})
 
