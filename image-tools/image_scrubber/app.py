@@ -7,12 +7,14 @@ small strict multipart reader (stdlib only).
 from __future__ import annotations
 
 import io
+import os
 import secrets
 import threading
 import time
 import uuid
 import webbrowser
 import zipfile
+from datetime import date
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
@@ -201,6 +203,8 @@ def make_handler(token: str):
                 return
             ai_tag = fields.get("ai_tag") in ("1", "true", "on", "yes")
             want_bg = fields.get("remove_bg") in ("1", "true", "on", "yes")
+            rename_files = fields.get("rename_files") in ("1", "true", "on", "yes")
+            stamp = date.today().isoformat()  # local date, e.g. 2026-10-17
 
             if want_bg:
                 # Fail fast with a clear message instead of per-file errors.
@@ -224,7 +228,7 @@ def make_handler(token: str):
             stored: dict[str, dict] = {}
             items = []
             ok_count = 0
-            for _field, filename, data in files:
+            for i, (_field, filename, data) in enumerate(files, start=1):
                 safe_name = (filename or "image").rsplit("/", 1)[-1].rsplit("\\", 1)[-1] or "image"
                 bg_note = ""
                 if want_bg:
@@ -236,11 +240,15 @@ def make_handler(token: str):
                     bg_note = bg_result["note"] + " "
                 result = scrub_image(data, safe_name, ai_tag=ai_tag)
                 if result["ok"]:
+                    out_filename = result["out_filename"]
+                    if rename_files:
+                        ext = os.path.splitext(out_filename)[1]
+                        out_filename = f"{stamp}-image{i:03d}{ext}"
                     fid = uuid.uuid4().hex[:8]
-                    stored[fid] = {"filename": result["out_filename"], "data": result["data"]}
+                    stored[fid] = {"filename": out_filename, "data": result["data"]}
                     ok_count += 1
                     items.append({"ok": True, "id": fid, "filename": safe_name,
-                                  "out_filename": result["out_filename"],
+                                  "out_filename": out_filename,
                                   "note": bg_note + result["note"], "size": result["size"]})
                 else:
                     items.append({"ok": False, "filename": safe_name, "error": result["error"]})
@@ -248,7 +256,8 @@ def make_handler(token: str):
                 _batches[batch_id] = {"created": time.time(), "files": stored}
             summary = (f"Scrubbed {ok_count} of {len(files)} file(s) clean."
                        + (" Backgrounds removed." if want_bg and ok_count else "")
-                       + (" AI tag applied." if ai_tag and ok_count else ""))
+                       + (" AI tag applied." if ai_tag and ok_count else "")
+                       + (" Filenames scrubbed." if rename_files and ok_count else ""))
             self._send(200, {"batch": batch_id, "items": items, "summary": summary})
 
     return Handler

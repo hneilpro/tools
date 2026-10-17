@@ -58,6 +58,13 @@ PAGE = """<!DOCTYPE html>
   </div>
 
   <div class="opts">
+    <input id="rename" type="checkbox">
+    <label for="rename">Scrub filenames too
+      <small>Renames every output to today's date plus a sequence: 2026-10-17-image001.png, 2026-10-17-image002.png, …</small>
+    </label>
+  </div>
+
+  <div class="opts">
     <input id="aitag" type="checkbox">
     <label for="aitag">Tag as AI-generated content
       <small>Adds a small "AI-generated" marker to the cleaned file (EXIF comment / PNG text).</small>
@@ -117,6 +124,7 @@ go.addEventListener("click", async () => {
   files.forEach(f => fd.append("files", f, f.name));
   fd.append("ai_tag", document.getElementById("aitag").checked ? "1" : "0");
   fd.append("remove_bg", document.getElementById("rmbg").checked ? "1" : "0");
+  fd.append("rename_files", document.getElementById("rename").checked ? "1" : "0");
   try {
     const r = await api("/api/clean", {method: "POST", body: fd});
     const j = await r.json();

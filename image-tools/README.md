@@ -13,6 +13,9 @@ everything. Useful before sharing or posting photos.
   marker to the cleaned file (EXIF UserComment on JPEG/WebP, PNG text
   chunk on PNG) so the file is honestly labeled without leaking anything
   else.
+- Optional **"Scrub filenames too"** checkbox renames every output to
+  today's date plus a sequence number (`2026-10-17-image001.png`,
+  `2026-10-17-image002.png`, …) so original filenames leak nothing.
 - Optional **"Remove background"** checkbox runs a tiny on-device AI
   (rembg + the ~5MB `u2netp` model, CPU only, no GPU/cloud/account) and
   returns the subject on transparency as PNG. The model downloads once on
